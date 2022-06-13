@@ -12,21 +12,19 @@ import kotlinx.serialization.decodeFromString
 @Serializable
 data class NewsItem(
     val title: String,
-    val image: String,
+    val image: String? = null,
     val text: String,
     val date: String
 )
 
 @Serializable
 data class NewsListResponseModel(
-    val errorCode: Int?,
-    val data: List<NewsItem>
+    val errorCode: Int? = 0,
+    val data: List<NewsItem>? = null
 )
 
 
 class Greeting {
-
-
 
     private val client = HttpClient()
     suspend fun getHtml(): String {
@@ -49,7 +47,7 @@ class Greeting {
     suspend fun getNewsList(): List<NewsItem> {
         val response: NewsListResponseModel =
             client.get("https://raw.githubusercontent.com/masha-b/api-testing/master/news-list.json").body()
-        return response.data
+        return response.data ?: listOf<NewsItem>()
     }
 
     suspend fun getNewsListFromContentTypeText(): List<NewsItem> {
@@ -60,6 +58,6 @@ class Greeting {
             ignoreUnknownKeys = true
         }
         val result: NewsListResponseModel = json.decodeFromString(response)
-        return result.data
+        return result.data ?: listOf<NewsItem>()
     }
 }
